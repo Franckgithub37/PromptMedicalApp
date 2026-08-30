@@ -1,0 +1,1 @@
+ALTER TABLE `cas_cliniques` ADD `symptomes` text;
