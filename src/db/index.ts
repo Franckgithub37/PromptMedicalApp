@@ -10,11 +10,12 @@ let _db: ReturnType<typeof drizzle<typeof schema>> | null = null;
 function getDb() {
   if (_db) return _db;
 
-  const url = process.env.TURSO_CONNECTION_URL;
+  // TURSO_DATABASE_URL est le nom créé par l'intégration Turso de Vercel
+  const url = process.env.TURSO_CONNECTION_URL || process.env.TURSO_DATABASE_URL;
   const authToken = process.env.TURSO_AUTH_TOKEN;
   if (!url || !authToken) {
     throw new Error(
-      'TURSO_CONNECTION_URL et TURSO_AUTH_TOKEN doivent être définies (Storage → connecter Turso sur le projet Vercel).'
+      'TURSO_DATABASE_URL (ou TURSO_CONNECTION_URL) et TURSO_AUTH_TOKEN doivent être définies (Storage → connecter Turso sur le projet Vercel).'
     );
   }
 

@@ -69,7 +69,17 @@ export async function POST(request: NextRequest) {
 
     // Build the exercise reference sheet
     const sheet = exerciseSheet || {};
-    const ficheExercice = `FICHE EXERCICE (grille de vérité) :
+    const isCadre = /cadre/i.test(String(sheet.profil || medicalCase.category || ''));
+    const ficheExercice = isCadre
+      ? `FICHE EXERCICE (grille de vérité) :
+Profil attendu : ${sheet.profil || medicalCase.category || 'Non précisé'}
+Titre : ${sheet.titreCas || medicalCase.title || 'Non précisé'}
+Mail du collaborateur : ${sheet.descriptionSituation || medicalCase.description || 'Non précisé'}
+Le collaborateur : ${sheet.antecedents || medicalCase.patientInfo?.history || 'Non précisé'}
+Informations clés : ${sheet.informationsCles || 'Non précisé'}
+Attendu du prompt : ${sheet.attenduPrompt || 'Non précisé'}
+Contexte : ${sheet.patientActe || 'Non précisé'}`.trim()
+      : `FICHE EXERCICE (grille de vérité) :
 Profil attendu : ${sheet.profil || medicalCase.category || 'Non précisé'}
 Titre : ${sheet.titreCas || medicalCase.title || 'Non précisé'}
 Description de la situation : ${sheet.descriptionSituation || medicalCase.description || 'Non précisé'}

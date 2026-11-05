@@ -13,6 +13,8 @@ interface MedicalCaseCardProps {
 }
 
 export default function MedicalCaseCard({ medicalCase, expected, keyInfo, profileKey }: MedicalCaseCardProps) {
+  // Profil cadre de santé : la situation est un mail de collaborateur, pas un patient
+  const isCadre = profileKey === 'cadre_sante';
   // Attendu du prompt - Positionné tout en haut
   const safeSplit = (text: string): string[] => {
     // Replace decimal dots/commas with a placeholder to protect them from splitting
@@ -32,7 +34,7 @@ export default function MedicalCaseCard({ medicalCase, expected, keyInfo, profil
     .map((s) => s.replace(/[{}\[\]"]+/g, '').trim())
     .filter(Boolean)
     .filter((s) => !/^\d+(?:[.,]\d+)?$/.test(s)) // remove isolated numbers
-    .filter((s) => !/(?:\b|^)(âge|ans|sexe|homme|femme|masculin|féminin|\bM\b|\bF\b)(?:\b|$)/i.test(s))
+    .filter((s) => !/(?<![\p{L}\p{N}])(âge|ans|sexe|homme|femme|masculin|féminin|m|f)(?![\p{L}\p{N}])/iu.test(s)) // limites de mots compatibles accents (ex : « février » n'est plus filtré)
     .slice(0, 6);
 
   const addMissingAbbreviations = (item: string): string => {
@@ -89,12 +91,12 @@ export default function MedicalCaseCard({ medicalCase, expected, keyInfo, profil
 
       <div className="space-y-4">
         <div>
-          <h3 className="text-lg font-semibold text-gray-800 mb-2 !whitespace-pre-line">Description de la situation</h3>
-          <p className="text-gray-700 leading-relaxed">{medicalCase.description}</p>
+          <h3 className="text-lg font-semibold text-gray-800 mb-2 !whitespace-pre-line">{isCadre ? 'Mail du collaborateur' : 'Description de la situation'}</h3>
+          <p className={`text-gray-700 leading-relaxed${isCadre ? ' whitespace-pre-line' : ''}`}>{medicalCase.description}</p>
         </div>
 
         <div className="p-4 rounded-xl bg-gray-50/80 border border-gray-100">
-          <h3 className="text-sm font-bold text-gray-900 mb-3 !whitespace-pre-line">Antécédents</h3>
+          <h3 className="text-sm font-bold text-gray-900 mb-3 !whitespace-pre-line">{isCadre ? 'Le collaborateur' : 'Antécédents'}</h3>
           <div className="flex flex-wrap gap-2">
             {historyItems.map((item, idx) => (
               <Badge key={idx} variant="secondary" className="text-xs whitespace-nowrap !text-white">
